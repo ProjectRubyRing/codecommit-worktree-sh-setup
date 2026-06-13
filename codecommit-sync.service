@@ -1,0 +1,17 @@
+# /etc/systemd/system/codecommit-sync.service
+# Forces runtime/main to match origin/main. Triggered by the timer below.
+[Unit]
+Description=Sync CodeCommit runtime/main worktree to origin/main
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+# Run as a dedicated, low-privilege account that owns the runtime tree.
+User=tfexec
+Group=tfexec
+ExecStart=/opt/codecommit/scripts/sync-main.sh
+# Harden the unit a little.
+NoNewPrivileges=true
+ProtectSystem=full
+PrivateTmp=true

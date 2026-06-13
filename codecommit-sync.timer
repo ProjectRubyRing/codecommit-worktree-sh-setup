@@ -1,0 +1,16 @@
+# /etc/systemd/system/codecommit-sync.timer
+# Runs the sync every 5 minutes (and once shortly after boot).
+# Enable with:
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now codecommit-sync.timer
+[Unit]
+Description=Periodic sync of CodeCommit runtime/main
+
+[Timer]
+OnBootSec=2min
+OnUnitActiveSec=5min
+AccuracySec=30s
+Persistent=true
+
+[Install]
+WantedBy=timers.target

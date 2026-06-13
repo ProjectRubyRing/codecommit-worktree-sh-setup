@@ -1,0 +1,21 @@
+# /etc/sudoers.d/codecommit-ops
+# Install with: visudo -f /etc/sudoers.d/codecommit-ops  (mode 0440)
+#
+# Goal: developers may *request* an apply only by switching to the dedicated
+# 'tfexec' identity through this single, fixed command. They get no general
+# root, and they cannot edit the runtime tree (it is owned by root/tfexec).
+#
+# Members of the 'tf-approvers' group may run apply as tfexec, nothing else.
+Cmnd_Alias TF_APPLY = /opt/codecommit/scripts/terraform-apply.sh ""
+
+# Allow running the apply wrapper as the tfexec service account only.
+%tf-approvers ALL=(tfexec) NOPASSWD: TF_APPLY
+
+# Developers (codecommit-dev) may run sync on demand but never apply.
+Cmnd_Alias TF_SYNC = /opt/codecommit/scripts/sync-main.sh ""
+%codecommit-dev ALL=(tfexec) NOPASSWD: TF_SYNC
+
+# Notes:
+#   * The trailing "" pins the allowed arguments; adjust if you pass a subdir.
+#   * Do NOT grant blanket `(ALL) NOPASSWD: ALL`.
+#   * Do NOT add developers to the 'wheel' group just for this.
